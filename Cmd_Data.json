@@ -9,7 +9,7 @@
             "memo": "[On 1to1] !test -> Hello World!"
         },
         "hello": {
-            "pm": true,
+            "pm": false,
             "body": "Hello Hello!",
             "group": true,
             "user": true,
