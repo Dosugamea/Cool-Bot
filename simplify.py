@@ -30,6 +30,13 @@ class Simplify(object):
             self.users = users
         else:
             raise ValueError("Not enough arguments")
+        for cmd in self.cmds:
+            if "pm" not in self.cmds[cmd]:
+                self.cmds[cmd]["pm"] = True
+            if "group" not in self.cmds[cmd]:
+                self.cmds[cmd]["group"] = True
+            if "user" not in self.cmds[cmd]:
+                self.cmds[cmd]["user"] = True
         self.cl = client
         
     #権限確認
@@ -61,10 +68,7 @@ class Simplify(object):
         #権限確認
         if self.perm_chk(cmd,_msg._from):
             #グル返信有効 かつ グルからのメッセージ
-            if "group" not in self.cmds[cmd] and "user" not in self.cmds[cmd]:
-                if _msg.toType == 0 or "to" in self.cmds[cmd]: _msg.to = _msg._from
-                self.send_reply(_msg.to,cmd_body,_msg)
-            elif self.cmds[cmd]["group"] == True and _msg.toType == 2:
+            if self.cmds[cmd]["group"] == True and _msg.toType == 2:
                 #送信先がuser固定なら 送り先を_msg._fromにする
                 if "to" in self.cmds[cmd]: _msg.to = _msg._from
                 #送り先と内容を指定して処理
@@ -91,17 +95,7 @@ class Simplify(object):
                 #ループ脱出用
                 if bye: break
                 #完全一致したら実行
-                if ("group" not in self.cmds[cmd] and "user" not in self.cmds[cmd]):
-                    if _msg.text == self.prefix+cmd or ("prefix" in self.cmds[cmd] and _msg.text == cmd):
-                        self.process_reply(cmd,_msg)
-                        break
-                    elif "alt" in self.cmds[cmd]:
-                        for altc in self.cmds[cmd]["alt"]:
-                            #完全一致したら実行
-                            if _msg.text == self.prefix+altc or ("prefix" in self.cmds[cmd] and _msg.text == altc):
-                                self.process_reply(cmd,_msg)
-                                break
-                elif _msg.text == self.prefix+cmd and self.cmds[cmd]["pm"] == True or ("prefix" in self.cmds[cmd] and _msg.text == cmd):
+                if _msg.text == self.prefix+cmd and self.cmds[cmd]["pm"] == True or ("prefix" in self.cmds[cmd] and _msg.text == cmd):
                     self.process_reply(cmd,_msg)
                     break
                 #不完全一致OK かつ 文字列が一致
