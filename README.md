@@ -1,5 +1,5 @@
 # Cool-Bot
-LINE unofficial bot for smart developers
+LINE unofficial bot templete for smart developers
 
 ## What's this?
 It is class of implements commands by json.
