@@ -5,19 +5,15 @@ from collections import OrderedDict
 
 class Simplify(object):
     CmdInterrupt = {}
-    default = "NORMAL"
+    default = ""
     cmds = {}
     types = {}
     perms = {}
     users = {}
-    err_msgs = {
-       "No Permission": "You don't have permission to use.",
-       "Use Limit": "You have reached usage limit."
-    }
     
     """ Main """
 
-    def __init__(self,client,default="NORMAL",prefix="!",cmds=None,types=None,perms=None,users=None,datas=None):
+    def __init__(self,client,default="ROM",prefix="!",cmds=None,types=None,perms=None,users=None,datas=None):
         self.err_msgs= {}
         self.prefix = prefix
         self.default = default
@@ -51,6 +47,9 @@ class Simplify(object):
         if cmd not in self.perms:
             return True
         else:
+            #権限制限に指定された権限が入っていなければ使用不可
+            if self.users[user]["Permission"] not in self.perms[cmd]:
+                return False
             #入っているならカウント制限があれば確認
             if self.users[user]["Count"][cmd] <= self.perms[cmd][self.users[user]["Permission"]] or (self.users[user]["Permission"] in self.perms[cmd] and self.perms[cmd][self.users[user]["Permission"]] == -1):
                 return True
@@ -62,7 +61,10 @@ class Simplify(object):
         #権限確認
         if self.perm_chk(cmd,_msg._from):
             #グル返信有効 かつ グルからのメッセージ
-            if self.cmds[cmd]["group"] == True and _msg.toType == 2:
+            if "group" not in self.cmds[cmd] and "user" not in self.cmds[cmd]:
+                if _msg.toType == 0 or "to" in self.cmds[cmd]: _msg.to = _msg._from
+                self.send_reply(_msg.to,cmd_body,_msg)
+            elif self.cmds[cmd]["group"] == True and _msg.toType == 2:
                 #送信先がuser固定なら 送り先を_msg._fromにする
                 if "to" in self.cmds[cmd]: _msg.to = _msg._from
                 #送り先と内容を指定して処理
@@ -83,16 +85,41 @@ class Simplify(object):
                 
     #返信するかどうかの処理
     def reply(self,_msg):
+        bye = False
         if _msg.contentType == 0:
             for cmd in self.cmds:
+                #ループ脱出用
+                if bye: break
                 #完全一致したら実行
-                if _msg.text == self.prefix+cmd and self.cmds[cmd]["pm"] == True:
+                if ("group" not in self.cmds[cmd] and "user" not in self.cmds[cmd]):
+                    if _msg.text == self.prefix+cmd or ("prefix" in self.cmds[cmd] and _msg.text == cmd):
+                        self.process_reply(cmd,_msg)
+                        break
+                    elif "alt" in self.cmds[cmd]:
+                        for altc in self.cmds[cmd]["alt"]:
+                            #完全一致したら実行
+                            if _msg.text == self.prefix+altc or ("prefix" in self.cmds[cmd] and _msg.text == altc):
+                                self.process_reply(cmd,_msg)
+                                break
+                elif _msg.text == self.prefix+cmd and self.cmds[cmd]["pm"] == True or ("prefix" in self.cmds[cmd] and _msg.text == cmd):
                     self.process_reply(cmd,_msg)
                     break
                 #不完全一致OK かつ 文字列が一致
                 elif self.cmds[cmd]["pm"] == False and (_msg.text[len(self.prefix):len(self.prefix+cmd)] == cmd or ("prefix" in self.cmds[cmd] and cmd in _msg.text)):
                     self.process_reply(cmd,_msg)
                     break
+                elif "alt" in self.cmds[cmd]:
+                    for altc in self.cmds[cmd]["alt"]:
+                        #完全一致したら実行
+                        if _msg.text == self.prefix+altc and self.cmds[cmd]["pm"] == True or ("prefix" in self.cmds[cmd] and _msg.text == altc):
+                            bye = True
+                            self.process_reply(cmd,_msg)
+                            break
+                        #不完全一致OK かつ 文字列が一致
+                        elif self.cmds[cmd]["pm"] == False and (_msg.text[len(self.prefix):len(self.prefix+altc)] == altc or ("prefix" in self.cmds[cmd] and altc in _msg.text)):
+                            bye = True
+                            self.process_reply(cmd,_msg)
+                            break
         elif str(_msg.contentType) in self.types:
                     if _msg.toType == 0:
                         self.send_reply(_msg._from,self.types[str(_msg.contentType)],_msg)
