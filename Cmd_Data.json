@@ -3,10 +3,10 @@
     "Commands": {
         "test": {
             "pm": true,
-            "body": "Hello World!",
+            "body": "This is a test.",
             "group": false,
             "user": true,
-            "memo": "[On 1to1] !test -> Hello World!"
+            "memo": "[On 1to1] !test -> This is a test."
         },
         "hello": {
             "pm": false,
@@ -22,6 +22,24 @@
             "group": true,
             "user": true,
             "memo": "[On 1to1 or Group] !world -> World World!"
+        },
+        "world2": {
+            "body": "World World!",
+            "memo": "[On 1to1 or Group] hello or !hello or hello_world... -> Hello Hello!"
+        },
+        "HelloWorld":{
+            "body": "Hello World!",
+            "prefix": false,
+            "alt": [
+                "Bonjour le monde",
+                "ハローワールド",
+                "こんにちは世界",
+                "Hallo Welt",
+                "Hola Mundo",
+                "Olá Mundo",
+                "Hallo Wereld",
+                "世界你好"
+            ]
         },
         "exec": {
             "pm": false,
