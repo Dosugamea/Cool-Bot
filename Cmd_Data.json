@@ -1,0 +1,61 @@
+{
+    "Prefix": "!",
+    "Commands": {
+        "test": {
+            "pm": true,
+            "body": "Hello World!",
+            "group": false,
+            "user": true,
+            "memo": "[On 1to1] !test -> Hello World!"
+        },
+        "hello": {
+            "pm": true,
+            "body": "Hello Hello!",
+            "group": true,
+            "user": true,
+            "to": "#Force send to user if there is a 'to' element.",
+            "memo": "[On 1to1 or Group] hello or !hello or hello_world... -> Hello Hello!"
+        },
+        "world": {
+            "pm": true,
+            "body": "World World!",
+            "group": true,
+            "user": true,
+            "memo": "[On 1to1 or Group] !world -> World World!"
+        },
+        "exec": {
+            "pm": false,
+            "body": "m_exec_thread()",
+            "group": true,
+            "user": true,
+            "memo": "!exec (PythonScript) -> PythonScript"
+        },
+        "からの着信がありました。通話の着信許可がOFFになっているため、応答できません。": {
+            "pm": false,
+            "body": "Sorry I can't receive a call > <",
+            "group": false,
+            "user": true,
+            "prefix": "#Ignore Prefix if there is a 'prefix' element."
+        }
+    },
+    "Types": {
+        "1": "Got Image",
+        "4": "Got Vote",
+        "14": "Got File",
+        "16": "Got Album or Note"
+    },
+    "Permissions": {
+        "test": {
+            "NORMAL": 2
+        }
+    },
+    "Users": {
+        "XXXXXXXXXXXXXXXX": {
+            "Permission": "NORMAL",
+            "Count": {
+                "test": 1,
+                "exec": 1
+            }
+        }
+    }
+}
